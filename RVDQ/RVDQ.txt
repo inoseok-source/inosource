@@ -1,0 +1,31 @@
+
+
+-cmname MyDQGroup -schedulerWeight 1 -heartbeat 1.5 -activation 3.5 test.subject 이 값들은 모두 동일하게 주어야함.
+
+1.QUEUE.SCHEDULER.ACTIVE, QUEUE.SCHEDULER.INACTIVE
+-rvd.exe -listen tcp:7500
+(1)tibrvdqlisten.exe -service 7500 -cmname MyDQGroup -workerWeight 1 -workerTasks 1 -schedulerWeight 1 -heartbeat 1.5 -activation 3.5 test.subject
+(2)tibrvdqlisten.exe -service 7500 -cmname MyDQGroup -workerWeight 2 -workerTasks 3 -schedulerWeight 1 -heartbeat 1.5 -activation 3.5 test.subject
+(3)tibrvdqlisten.exe -service 7500 -cmname MyDQGroup -workerWeight 6 -workerTasks 7 -schedulerWeight 1 -heartbeat 1.5 -activation 3.5 test.subject
+-(1)을 먼저 실행하면, _RV.INFO.RVCM.QUEUE.SCHEDULER.ACTIVE.MyDQGroup 출력함.
+-rvd.exe를 ctr+c나 작업관리자에서 죽이면(죽었다가 다시 살아남), (1)은 _RV.INFO.RVCM.QUEUE.SCHEDULER.INACTIVE.MyDQGroup 출력하고, INACTIVE로 바뀜.
+-(3)이 _RV.INFO.RVCM.QUEUE.SCHEDULER.ACTIVE.MyDQGroup 출력하고, ACTIVE로 바뀜. (workerWeight 값이 큰 (3)이 ACTIVE로 바뀜.)
+(4)rvd.exe를 실행하고, (1)을 실행하면, (1)은 ACTIVE가 됨. 이어서 (2),(3) 실행하면, INATIVE 상태이고, 다른 로그를 출력하지 않음. 이 상태에서 (1)을 ctr+c로
+죽이면, (3)이 _RV.INFO.RVCM.QUEUE.SCHEDULER.ACTIVE.MyDQGroup 출력함. 따로 INACTIVE advisory 메시지를 출력하지 않음.
+
+2.QUEUE.SCHEDULER.OVERFLOW
+(1)tibrvdqlisten.exe -service 7500 -cmname MyDQGroup -workerWeight 1 -workerTasks 1 -schedulerWeight 1 -heartbeat 1.5 -activation 3.5 -delay 2.0 -backlogMsgs 50 test.subject
+(2)tibrvdqlisten.exe -service 7500 -cmname MyDQGroup -workerWeight 3 -workerTasks 3 -schedulerWeight 1 -heartbeat 1.5 -activation 3.5 -delay 2.0 -backlogMsgs 50 test.subject
+(3)tibrvcmsend.exe -service 7500 -rounds 500 -interval 0.01 test.subject "X"
+-(3)을 실행하면, (1)터미널에 아래와 같이 출력됨.
+DEBUG: group=MyDQGroup workerWeight=1 workerTasks=1 schedulerWeight=1 heartbeat=1.500000 activation=3.500000 backlogMsgs=50
+tibrvdqlisten.exe: Listening to subject test.subject
+subject=_RV.INFO.RVCM.QUEUE.SCHEDULER.ACTIVE.MyDQGroup, reply=none, message={ADV_CLASS="INFO" ADV_SOURCE="RVCM" ADV_NAME="QUEUE.SCHEDULER.ACTIVE.MyDQGroup" name="MyDQGroup"}, certified= FALSE
+subject=test.subject, reply=none, message={DATA="X"}, certified= TRUE, sequence=4
+subject=_RV.WARN.RVCM.QUEUE.SCHEDULER.OVERFLOW.MyDQGroup, reply=none, message={ADV_CLASS="WARN" ADV_SOURCE="RVCM" ADV_NAME="QUEUE.SCHEDULER.OVERFLOW.MyDQGroup" name="MyDQGroup" subject="test.subject" sender="RVCMPUB" seqno=55 reason="Task backlog limit reached."}, certified= FALSE
+subject=_RV.WARN.RVCM.QUEUE.SCHEDULER.OVERFLOW.MyDQGroup, reply=none, message={ADV_CLASS="WARN" ADV_SOURCE="RVCM" ADV_NAME="QUEUE.SCHEDULER.OVERFLOW.MyDQGroup" name="MyDQGroup" subject="test.subject" sender="RVCMPUB" seqno=55 reason="Task backlog limit reached."}, certified= FALSE
+subject=test.subject, reply=none, message={DATA="X"}, certified= TRUE, sequence=6
+subject=test.subject, reply=none, message={DATA="X"}, certified= TRUE, sequence=8
+subject=test.subject, reply=none, message={DATA="X"}, certified= TRUE, sequence=10
+subject=test.subject, reply=none, message={DATA="X"}, certified= TRUE, sequence=12
+-task queue의 backlogMsgs limit을 50으로 잡아서, ADV_NAME="QUEUE.SCHEDULER.OVERFLOW.MyDQGroup" name="MyDQGroup" subject="test.subject" sender="RVCMPUB" seqno=55 reason="Task backlog limit reached  
