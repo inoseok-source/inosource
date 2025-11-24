@@ -12,4 +12,6 @@
 - T2 실행하면 active상태가 되고, tibrvcmlisten.exe에 메시지를 보내면서, 시퀀스 번호를 확인함.
 - T3 실행하면, T2는 deactivate 상태가 되고, T3가 activate 상태가 됨. ledger파일을 공유하기 때문에 T2가 보내고 멈춘 이후의 시퀀스 번호로 메시지를 보냄.
 - T2나 T3가 실행될 때 다음과 같이 메시지를 출력함.
-  - subject=_RV.INFO.RVCM.REGISTRATION.MOVED.RVCMPUB, reply=none, message={ADV_CLASS="INFO" ADV_SOURCE="RVCM" ADV_NAME="REGISTRATION.MOVED.RVCMPUB" name="RVCMPUB"}, certified sender=FALSE, receipt uncertified 
+```
+subject=_RV.INFO.RVCM.REGISTRATION.MOVED.RVCMPUB, reply=none, message={ADV_CLASS="INFO" ADV_SOURCE="RVCM" ADV_NAME="REGISTRATION.MOVED.RVCMPUB" name="RVCMPUB"}, certified sender=FALSE, receipt uncertified 
+```
