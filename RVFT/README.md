@@ -1,1 +1,119 @@
+## 기본 터미널 명령어
+```
+rvd.exe -service 7500
+rvd.exe -listen tcp:7500
+tibrvfttime.exe -service 7500 -ft-activate 4.8 -ft-weight 100
+tibrvfttime.exe -service 7500 -ft-activate 5.0 -ft-weight 50
+tibrvftmon.exe -service 7500 -ft-lost-interval 4.8
+```
+
+## _RV.ERROR.RVFT.PARAM_MISMATCH.group 테스트
+- 이 오류는 Active goal 또는 Activation interval이 다를 때 발생합니다.
+- 테스트 목표: 두 멤버의 activateInterval 값을 다르게 설정하여 오류를 유도합니다.
+
+#### 실행 명령어와 ADVISORY 메시지:
+```
+tibrvfttime.exe -service 7500 -ft-activate 4.8 -ft-weight 100
+#### RVFT ADVISORY: _RV.ERROR.RVFT.PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE
+Advisory message is: {ADV_CLASS="ERROR" ADV_SOURCE="RVFT" ADV_NAME="PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE" ADV_DESC="Activation interval differs"}
+
+tibrvfttime.exe -service 7500 -ft-activate 5.0 -ft-weight 50
+#### RVFT ADVISORY: _RV.ERROR.RVFT.PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE
+Advisory message is: {ADV_CLASS="ERROR" ADV_SOURCE="RVFT" ADV_NAME="PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE" ADV_DESC="Activation interval differs"}
+
+tibrvftmon.exe -service 7500 -ft-lost-interval 4.8
+```
+
+## _RV.WARN.RVFT.PARAM_MISMATCH.group 테스트
+- 이 경고는 Heartbeat interval이 다르거나 Preparation interval과 Heartbeat interval이 충돌할 때 발생합니다.
+- 테스트 목표: 두 멤버의 heartbeatInterval 값을 다르게 설정하여 경고를 유도합니다.
+
+### (1) Heartbeat interval 값이 다를 경우 테스트
+
+#### 실행 명령어와 ADVISORY 메시지:
+```
+tibrvfttime.exe -service 7500 -ft-heartbeat 1.5 -ft-activate 4.8 -ft-weight 100
+#### RVFT ADVISORY: _RV.WARN.RVFT.PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE
+Advisory message is: {ADV_CLASS="WARN" ADV_SOURCE="RVFT" ADV_NAME="PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE" ADV_DESC="Heartbeat interval differs"}
+
+tibrvfttime.exe -service 7500 -ft-heartbeat 2.0 -ft-activate 4.8 -ft-weight 50
+#### RVFT ADVISORY: _RV.WARN.RVFT.PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE
+Advisory message is: {ADV_CLASS="WARN" ADV_SOURCE="RVFT" ADV_NAME="PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE" ADV_DESC="Heartbeat interval differs"}
+
+tibrvftmon.exe -service 7500 -ft-lost-interval 4.8
+```
+### (2) Preparation Interval 충돌 경고 테스트
+- 테스트 목표: 한 멤버의 preparationInterval을 다른 멤버의 heartbeatInterval보다 작게 설정하여 경고를 유도합니다.
+
+#### 주의사항
+- prepare가 hearbeat 보다 커야함. 작으면 tibrvfttime.exe 실행할 때 에러남.
+- tibrvfttime.exe -service 7500 -ft-heartbeat 5.0 -ft-prepare 1.0 -ft-activate 10.0 -ft-weight 100
+
+#### 실행 명령어와 ADVISORY 메시지:
+```
+tibrvfttime.exe -service 7500 -ft-heartbeat 5.0 -ft-prepare 6.0 -ft-activate 10.0 -ft-weight 100
+#### RVFT ADVISORY: _RV.WARN.RVFT.PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE
+Advisory message is: {ADV_CLASS="WARN" ADV_SOURCE="RVFT" ADV_NAME="PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE" ADV_DESC="Other prepares before this member's heartbeat"}
+
+tibrvfttime.exe -service 7500 -ft-heartbeat 3.0 -ft-prepare 4.0 -ft-activate 10.0 -ft-weight 50
+#### RVFT ADVISORY: _RV.WARN.RVFT.PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE
+Advisory message is: {ADV_CLASS="WARN" ADV_SOURCE="RVFT" ADV_NAME="PARAM_MISMATCH.TIBRVFT_TIME_EXAMPLE" ADV_DESC="This member prepares before other's heartbeat"}
+
+tibrvftmon.exe -service 7500 -ft-lost-interval 4.8
+```
+
+## _RV.WARN.RVFT.TOO_MANY_ACTIVE.TIBRVFT_TIME_EXAMPLE
+### (1) active goal(-ft-numactive) 값을 터미널 별로 다른 값을 설정했을 때
+- 멤버별 목표 활성 멤버 수 불일치: 멤버 A와 B가 서로 다른 목표 활성 멤버 수(예: A는 1, B는 2)를 가질 경우, 두 멤버 모두 활성화되고 A는 멤버 수가 너무 많다는 경고를 받습니다. (이 경우 PARAM_MISMATCH 오류도 함께 발생합니다.)
+```
+rvd.exe -listen tcp:7500
+tibrvftmon.exe -service 7500 -ft-lost-interval 4.8
+tibrvfttime.exe -service 7500 -ft-heartbeat 1.5 -ft-activate 4.8 -ft-weight 100 -ft-numactive 1
+tibrvfttime.exe -service 7500 -ft-heartbeat 1.5 -ft-activate 4.8 -ft-weight 50 -ft-numactive 2
+```
+### (2) -ft-heartbeat와 -ft-activate interval을 짧게 설정했을 때
+- 간격 매개변수가 너무 짧음: 하드웨어 클럭이나 OS 서비스 속도에 비해 Rendezvous FT 소프트웨어에 설정된 간격 매개변수(예: 하트비트 간격)가 너무 짧을 때 발생합니다.
+- 멤버 상실 오인: 서로 상대방의 하트비트를 제때 받지 못하면, 두 인스턴스 모두 **"상대방이 죽었다"**고 오인하고 자신이 Primary가 되려고 경쟁합니다.
+```
+rvd.exe -listen tcp:7500
+tibrvftmon.exe -service 7500 -ft-lost-interval 0.02
+tibrvfttime.exe -service 7500 -ft-heartbeat 0.001 -ft-activate 0.02 -ft-weight 100
+tibrvfttime.exe -service 7500 -ft-heartbeat 0.001 -ft-activate 0.02 -ft-weight 50(먼저 실행)
+```
+
+### (3) pubTime함수에 Sleep(5000)을 주고, 테스트(#include <windows.h> 추가, timeInt = 2.0)
+- 활성 멤버가 적시에 하트비트를 보내지 못함: 예를 들어, 콜백 함수가 블록(Block)되거나 신속하게 반환되지 않아 하트비트 메시지 전송이 지연될 때 발생할 수 있습니다.
+- 아래 명령어에서 T1 실행하고, active된 상태에서, T2 실행하면 T2가 weight 값이 더 크니까, active가 되어야함. 그런데 pubTime함수에 5초 동안 sleep을 주었기 때문에, tibrvQueue_Dispatch함수를 통해서 큐에 쌓여있는 이벤트를 한 개씩 꺼내서 처리할 때, 지연이 발생해서 hearbeat 이벤트도 지연이 발생됨. 제때 hearbeat이 처리되지 못하면, T1을 active 인식함. 
+```
+rvd.exe -listen tcp:7500
+tibrvftmon.exe -service 7500 -ft-lost-interval 4.8
+T1: tibrvfttime.exe -service 7500 -ft-heartbeat 1 -ft-activate 4.8 -ft-weight 50(먼저 실행)
+T2: tibrvfttime.exe -service 7500 -ft-heartbeat 1 -ft-activate 4.8 -ft-weight 100
+```
+- 네트워크 분할 후 재연결: 네트워크가 둘 이상의 분리된 부분으로 나뉘었다가 다시 연결될 때 발생할 수 있습니다. 각 분할된 네트워크 부분에서 올바른 수의 활성 멤버가 설정되지만, 재연결 시 순위가 낮은 활성 멤버는 불필요해져 빠르게 비활성화됩니다.
+
+
+## _RV.WARN.RVFT.TOO_FEW_ACTIVE.TIBRVFT_TIME_EXAMPLE
+```
+rvd.exe -listen tcp:7500
+tibrvftmon.exe -service 7500 -ft-lost-interval 4.8
+T1: tibrvfttime.exe -service 7500 -ft-heartbeat 1.5 -ft-activate 4.8 -ft-weight 100 -ft-numactive 2
+T2: tibrvfttime.exe -service 7500 -ft-heartbeat 1.5 -ft-activate 4.8 -ft-weight 90 -ft-numactive 2
+T3: tibrvfttime.exe -service 7500 -ft-heartbeat 1.5 -ft-activate 4.8 -ft-weight 1 -ft-numactive 2
+T4: tibrvfttime.exe -service 7500 -ft-heartbeat 1.5 -ft-activate 4.8 -ft-weight 1 -ft-numactive 2
+```
+- T1, T2, T3, T4를 동시에 실행한다. 그리고 T1을 죽인다. T1을 다시 실행한다. 그다음 T1, T2를 죽인다. T2를 바로 다시 실행하면, T3에서 _RV.WARN.RVFT.TOO_FEW_ACTIVE.TIBRVFT_TIME_EXAMPLE 메시지가 출력되는 것을 확인할 수 있다.(T4의 -ft-weight 값을 2 or 50 으로 설정해도 확인 가능)
+
+### TOO_FEW_ACTIVE 경고의 목적 (Purpose)
+- 목표 미달 알림: FT 멤버가 활성 멤버 수가 너무 적다고 감지했을 때 이 경고를 발행합니다.
+- 일시적 현상: 이 상황은 보통 일시적이며, 시스템이 자동으로 복구하면서 빠르게 해결됩니다.
+- 지속 시 조치 필요: 하지만 경고가 계속된다면, 즉각적인 주의와 조치가 필요한 근본적인 문제가 있음을 나타냅니다.
+
+### 발생 조건 (Remarks)
+- 이 경고는 다음 세 가지 조건이 모두 동시에 충족될 때 발생합니다.
+  - 경고 수신 멤버가 비활성 상태(Inactive): 이 메시지를 보고 있는 멤버는 현재 Primary(활성) 역할이 아닙니다.
+  - 경고 수신 멤버가 활성화되지 않을 예정: 이 멤버의 순위(Weight)가 낮아 Primary가 될 수 없습니다. (즉, Standby 역할이 예정되어 있습니다.)
+  - 그럼에도 불구하고, 활성 멤버 수가 목표치(Active Goal)보다 적음: 현재 네트워크에서 하트비트를 보내는 멤버의 수가 설정된 목표 활성 멤버 수에 미달합니다.
+- 요약: "나는 Primary가 되기에 적합하지 않은데, 그룹 전체의 Primary 수가 부족한 상태"일 때 이 경고가 발생합니다.
+- 참고: 활성 상태이거나 곧 활성화될 예정인 멤버는 이 경고를 받지 않습니다.
 
