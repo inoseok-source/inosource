@@ -1,13 +1,13 @@
-## REGISTRATION.NO_RESPONSE(listener)
+## :camel: REGISTRATION.NO_RESPONSE(listener)
 - tibrvcmlisten.exe -service 7500 -cmname RVCMSUB -ledger RVCMSUB.ledger test.subject
 - tibrvcmsend.exe와 rvd.exe는 실행하지 않고, tibrvcmlisten.exe만 실행시킴.
 
-## REGISTRATION.COLLISION(listener, sender)
-### listener 테스트(rvd.exe실행 or 미실행 둘다 advisory 메시지 출력)
+## :rocket: REGISTRATION.COLLISION(listener, sender)
+### ✨listener 테스트(rvd.exe실행 or 미실행 둘다 advisory 메시지 출력)
 - cmd 한 개 열고, 다음 명령어 실행. tibrvcmlisten.exe -service 7500 -cmname RVCMSUB test.subject
 - cmd 한 개 더 열고, 동일하게 명령어 실행. tibrvcmlisten.exe -service 7500 -cmname RVCMSUB test.subject
 - 두 개의 listener에서 advisory 메시지 출력 됨.
-### listener, sender 테스트
+### ✨listener, sender 테스트
 - rvd.exe -listen tcp:7500 실행
 - tibrvcmlisten.exe -service 7500 -cmname RVCMSUB test.subject 실행
 - tibrvcmsend.exe -service 7500 -cmname RVCMSUB -rounds 1000 -ledger RVCMPUB.ledger test.subject "Hello, World" 실행
