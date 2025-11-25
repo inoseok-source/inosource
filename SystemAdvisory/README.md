@@ -1,4 +1,4 @@
-## ._RV.WARN.SYSTEM.RVD.DISCONNECTED, _RV.INFO.SYSTEM.RVD.CONNECTED
+## _RV.WARN.SYSTEM.RVD.DISCONNECTED, _RV.INFO.SYSTEM.RVD.CONNECTED
 ```
 rvd.exe -listen tcp:7500
 T1: tibrvfttime.exe -service 7500 -ft-heartbeat 1.5 -ft-activate 4.8 -ft-weight 100
