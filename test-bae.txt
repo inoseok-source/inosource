@@ -1,2 +1,11 @@
-https://www.aitimes.com/news/articleView.html?idxno=204578
+[C언어 학습] 위키독스
+https://wikidocs.net/book/2494
+https://wikidocs.net/book/18310
+https://wikidocs.net/book/10226
+https://wikidocs.net/book/314
+
+[Rust언어 학습] 위키독스
 https://wikidocs.net/book/16747
+
+[기타]
+https://www.aitimes.com/news/articleView.html?idxno=204578
