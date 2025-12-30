@@ -15,3 +15,11 @@ https://wikidocs.net/book/16747
 [기타]
 https://www.aitimes.com/news/articleView.html?idxno=204578
 MS Office 2016 RCXXN-FM8QX-X2VDX-4RQFH-GCQMB
+
+[Windows background기동방법 2가지]
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run chr(34) & "배치파일경로\배치파일.bat" & Chr(34), 0
+Set WshShell = Nothing
+---------------
+Set objShell=CreateObject("Shell.Application")
+objShell.ShellExecute "C:\work\batch\rvrd9101.bat","/c lodctr.exe /r","","runas",0
