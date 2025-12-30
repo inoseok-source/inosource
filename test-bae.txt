@@ -12,10 +12,6 @@ https://wikidocs.net/book/18442
 [Rust언어 학습] 위키독스
 https://wikidocs.net/book/16747
 
-[기타]
-https://www.aitimes.com/news/articleView.html?idxno=204578
-MS Office 2016 RCXXN-FM8QX-X2VDX-4RQFH-GCQMB
-
 [Windows background기동방법 2가지]
 Set WshShell = CreateObject("WScript.Shell")
 WshShell.Run chr(34) & "배치파일경로\배치파일.bat" & Chr(34), 0
@@ -30,3 +26,10 @@ Do While True
  WScript.Sleep 59000
  ws.SendKeys "{NUMLOCK}"
 Loop
+
+[Windows task 죽이기]
+taskkill /f /im WScript.exe
+
+[기타]
+MS Office 2016 Key RCXXN-FM8QX-X2VDX-4RQFH-GCQMB
+https://www.aitimes.com/news/articleView.html?idxno=204578
