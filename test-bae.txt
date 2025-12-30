@@ -23,3 +23,10 @@ Set WshShell = Nothing
 ---------------
 Set objShell=CreateObject("Shell.Application")
 objShell.ShellExecute "C:\work\batch\rvrd9101.bat","/c lodctr.exe /r","","runas",0
+
+[Windows 대기화면으로 가지않게 하기]
+Set ws = CreateObject("WScript.shell")
+Do While True
+ WScript.Sleep 59000
+ ws.SendKeys "{NUMLOCK}"
+Loop
