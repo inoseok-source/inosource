@@ -33,3 +33,5 @@ taskkill /f /im WScript.exe
 [기타]
 MS Office 2016 Key RCXXN-FM8QX-X2VDX-4RQFH-GCQMB
 https://www.aitimes.com/news/articleView.html?idxno=204578
+
+https://blog.naver.com/kwy3000/223651627009
