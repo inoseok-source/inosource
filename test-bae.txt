@@ -32,6 +32,7 @@ taskkill /f /im WScript.exe
 
 [Officd2016키 적용] >> 관리자권한 cmd
 cd /d %ProgramFiles%\Microsoft Office\Office16
+32비트case ==> cd /d %ProgramFiles(x86)%\Microsoft Office\Office16 
 for /f %x in ('dir /b ..\root\Licenses16\proplusvl_kms*.xrm-ms') do cscript ospp.vbs /inslic:"..\root\Licenses16\%x"
 cscript ospp.vbs /inpkey:RCXXN-FM8QX-X2VDX-4RQFH-GCQMB
 cscript ospp.vbs /sethst:kms8.msguides.com
