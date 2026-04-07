@@ -11,33 +11,3 @@ https://wikidocs.net/book/18442
 
 [Rust언어 학습] 위키독스
 https://wikidocs.net/book/16747
-
-[Windows background기동방법 2가지]
-Set WshShell = CreateObject("WScript.Shell")
-WshShell.Run chr(34) & "배치파일경로\배치파일.bat" & Chr(34), 0
-Set WshShell = Nothing
----------------
-Set objShell=CreateObject("Shell.Application")
-objShell.ShellExecute "C:\work\batch\rvrd9101.bat","/c lodctr.exe /r","","runas",0
-
-[Windows 대기화면으로 가지않게 하기]
-Set ws = CreateObject("WScript.shell")
-Do While True
- WScript.Sleep 59000
- ws.SendKeys "{NUMLOCK}"
-Loop
-
-[Windows task 죽이기]
-taskkill /f /im WScript.exe
-
-[Officd2016키 적용] >> 관리자권한 cmd
-cd /d %ProgramFiles%\Microsoft Office\Office16
-32비트case ==> cd /d %ProgramFiles(x86)%\Microsoft Office\Office16 
-for /f %x in ('dir /b ..\root\Licenses16\proplusvl_kms*.xrm-ms') do cscript ospp.vbs /inslic:"..\root\Licenses16\%x"
-cscript ospp.vbs /inpkey:RCXXN-FM8QX-X2VDX-4RQFH-GCQMB
-cscript ospp.vbs /sethst:kms8.msguides.com
-cscript ospp.vbs /act
-
-[기타]
-https://www.aitimes.com/news/articleView.html?idxno=204578
-https://blog.naver.com/kwy3000/223651627009
