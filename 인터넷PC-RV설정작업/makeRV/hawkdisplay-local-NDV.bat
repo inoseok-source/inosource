@@ -1,0 +1,1 @@
+c:\tibco\hawk\6.1\bin\tibhawkdisplay.exe -hawk_domain NDV_UT -rvd_session 9212 ;231.9.2.12; tcp:10.98.163.137:9201
