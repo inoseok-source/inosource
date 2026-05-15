@@ -30,8 +30,7 @@ tibrvlisten: Listening to subject TEST.>
 
 1개만 출력됨.
 
-or
-
+(4) local network interface 삭제 + 테스트(service, network 옵션 삭제)
 C:\Users\Administrator>tibrvsend -daemon tcp:9201 "TEST.TOPIC" "Hello RVRD"
 Publishing: subject=TEST.TOPIC "Hello RVRD"
 
@@ -39,5 +38,5 @@ C:\Users\Administrator>tibrvlisten -daemon tcp:9201 "TEST.>"
 tibrvlisten: Listening to subject TEST.>
 2026-05-14 14:58:39 (2026-05-14 05:58:39.641000000Z): subject=TEST.TOPIC, message={DATA="Hello RVRD"} 
 
-1개반 출력됨.
+1개만 출력됨.
 ```
