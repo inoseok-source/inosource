@@ -1,0 +1,57 @@
+set PATH=C:\tibco\tibrv\9.0\bin;%PATH%
+set PATH=C:\tibco\tibrv\8.7\bin;%PATH%
+set TIBRV_LICENSE=c:\tibco\tibrv\9.0\license\tibrv.lic
+
+rvd -listen tcp:9001 -http 9031 -reliability 30
+tibrvcmlisten -daemon tcp:9001 -service 19001 "rendezvous.dummy.process"
+tibrvcmsend -daemon tcp:9001 -service 19001 -rounds 5000 -interval 2 -ledger c:\tmp\ledger-sender1 -msglen 16 "rendezvous.dummy.process" "message1111"
+
+tibrvcmlisten -daemon tcp:9001 -service 19011 -cmname RVCMSUB2 "rendezvous.dummy.process2"
+tibrvcmsend -daemon tcp:9001 -service 19011 -cmname RVCMPUB2 -rounds 5000 -interval 2 -msglen 14 "rendezvous.dummy.process2" "message2222"
+
+컴파일 방법
+cd C:\work\examples\c
+set PATH=c:\mingw\bin;%PATH%
+gcc -o tibrvcmsend tibrvcmsend.c -Ic:\tibco\tibrv\8.7\include -ltibrv -ltibrvcm -Lc:\tibco\tibrv\8.7\lib
+gcc -o tibrvcmlisten tibrvcmlisten.c -Ic:\tibco\tibrv\8.7\include -ltibrv -ltibrvcm -Lc:\tibco\tibrv\8.7\lib
+gcc -o xxxx xxxx.c -Ic:\tibco\tibrv\8.7\include -ltibrv -ltibrvcm -ltibrvcmq -ltibrvft -Lc:\tibco\tibrv\8.7\lib
+
+tibrvcfg -http-only -url http://localhost:9131 dumpXML aaa.xml
+tibrvcfg -http-only -url http://localhost:9131 matchXML aaa.xml
+
+rvlat srv -daemon tcp:9101 -service 19101
+rvlat cli -daemon tcp:9101 -service 19101 -messages 10000 -time 4 -size 1000 -batch 10 -interval 2
+
+rvrd -listen tcp:9101 -http 9131 -http-only -store c:\tmp\rvrd_9101.cfg -logfile c:\tmp\rvrd_9101.log -log-max-size 10000 -log-max-rotations 5 -reliability 1
+tibrvcmlisten -daemon tcp:9101 -service 19101 -cmname RVCMSUB "rendezvous.dummy.process"
+tibrvcmsend -daemon tcp:9101 -service 19101 -cmname RVCMPUB1 -rounds 5000 -interval 2 -ledger c:\tmp\ledger-sender1 -msglen 16 "rendezvous.dummy.process" "message1111"
+tibrvcmsend -daemon tcp:9101 -service 19101 -cmname RVCMPUB2 -rounds 5000 -interval 3 -ledger c:\tmp\ledger-sender2 rendezvous.dummy.process message2222
+tibrvcmsend -daemon tcp:9101 -service 19101 -rounds 5000 -interval 2 -ledger c:\tmp\ledger-sender1 -msglen 16 -timeLimit 10 "rendezvous.dummy.process" "message1111"
+tibrvlisten -daemon tcp:9101 -service 19101 "_RV.*.SYSTEM.>" "_RV.*.RVCM.>" "_RV.*.RVFT.>"
+[JAVA]   ====================================================
+cd C:\work\examples\java
+java -cp ".;C:\tibco\tibrv\8.7\lib\tibrvj.jar" cmlistener -daemon tcp:9101 -service 19101 -cmname RVCMSUB -subject "rendezvous.dummy.process"
+java -cp ".\;C:\tibco\tibrv\8.7\lib\tibrvj.jar" cmsender -daemon tcp:9101 -service 19101 -cmname RVCMPUB1 -count 5000 -subject "rendezvous.dummy.process"
+[compile]====================================================
+javac -cp ".\;C:\tibco\tibrv\8.7\lib\tibrvj.jar" cmlistener.java
+javac -cp ".\;C:\tibco\tibrv\8.7\lib\tibrvj.jar" cmsender.java
+
+set PATH=C:\tibco\tibrv\8.7\bin;%PATH%
+기동
+rvd -listen tcp:9001 -http 9031 -logfile c:\tmp\rvd_9001.log -log-max-size 10000 -log-max-rotations 5 -reliability 30
+rvd -listen tcp:9011 -http 9041 -logfile c:\tmp\rvd_9011.log -log-max-size 10000 -log-max-rotations 5 -reliability 0
+
+java -cp ".;C:\tibco\tibrv\8.7\lib\tibrvj.jar" cmlistener -daemon tcp:9001 -service 19001 -cmname RVCMSUB -subject "rendezvous.dummy.process"
+java -cp ".;C:\tibco\tibrv\8.7\lib\tibrvj.jar" cmsender -daemon tcp:9001 -service 19001 -cmname RVCMPUB1 -count 5000 -subject "rendezvous.dummy.process"
+
+송수신
+C:\tibco\tibrv\8.7\bin\tibrvlisten -daemon tcp:9001 -service 20111 "TEST.SUBJECT"
+C:\tibco\tibrv\8.7\bin\tibrvsend -daemon tcp:9001 -service 20111 "TEST.SUBJECT" "TEST MSG"
+
+
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run chr(34) & "배치파일경로\배치파일.bat" & Chr(34), 0
+Set WshShell = Nothing
+
+Set objShell=CreateObject("Shell.Application")
+objShell.ShellExecute "C:\work\batch\rvrd9101.bat","/c lodctr.exe /r","","runas",0

@@ -1,0 +1,16 @@
+컴파일 방법
+cd C:\work\codes\rv-samples
+gcc -o tibrvcmsend tibrvcmsend.c -Ic:\tibco\tibrv\9.0\include -ltibrv -ltibrvcm -Lc:\tibco\tibrv\9.0\lib
+gcc -o tibrvcmlisten tibrvcmlisten.c -Ic:\tibco\tibrv\9.0\include -ltibrv -ltibrvcm -Lc:\tibco\tibrv\9.0\lib
+gcc -o xxxx xxxx.c -Ic:\tibco\tibrv\9.0\include -ltibrv -ltibrvcm -ltibrvcmq -ltibrvft -Lc:\tibco\tibrv\9.0\lib
+
+실행 방법
+set PATH=C:\tibco\tibrv\9.0\bin;%PATH%
+set TIBRV_LICENSE=C:\tibco\tibrv\license\RV-license-to20271231.bin
+
+rvd -listen tcp:9001 -http 9031 -reliability 30
+tibrvcmlisten -daemon tcp:9001 -service 19001 "rendezvous.dummy.process"
+tibrvcmsend -daemon tcp:9001 -service 19001 -rounds 5000 -interval 2 -cmname RVCMPUB1 "rendezvous.dummy.process" "message1111"
+
+tibrvcmlisten -daemon tcp:9001 -service 19011 -cmname RVCMSUB2 "rendezvous.dummy.process2"
+tibrvcmsend -daemon tcp:9001 -service 19011 -cmname RVCMPUB2 -rounds 5000 -interval 2 -msglen 14 "rendezvous.dummy.process2" "message2222"
